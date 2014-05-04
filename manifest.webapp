@@ -1,0 +1,14 @@
+{
+  "name": "KletterWetter",
+  "description": "find nearby sport climbing sites",
+  "launch_path": "/app.html",
+  "icons": {
+    "128": "/images/app_icon_128.png",
+    "60": "/images/app_icon_60.png"
+  },
+  "version": "1.1",
+  "developer": {
+    "name": "Martin Koeller",
+  },
+  "default_locale": "en"
+}

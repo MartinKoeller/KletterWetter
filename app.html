@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no" />
+  <title>KletterWetter</title>
+
+  <!-- my addons -->
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+<link rel="stylesheet" href="/resources/demos/style.css" />
+
+  <!-- from here its like on Building blocks  -->
+
+  <!-- Building blocks -->
+  <link rel="stylesheet" href="style/action_menu.css">
+  <link rel="stylesheet" href="style/buttons.css">
+  <link rel="stylesheet" href="style/confirm.css">
+  <link rel="stylesheet" href="style/edit_mode.css">
+  <link rel="stylesheet" href="style/headers.css">
+  <link rel="stylesheet" href="style/input_areas.css">
+  <link rel="stylesheet" href="style/status.css">
+  <link rel="stylesheet" href="style/switches.css">
+  <link rel="stylesheet" href="style_unstable/drawer.css">
+  <link rel="stylesheet" href="style_unstable/lists.css">
+  <link rel="stylesheet" href="style_unstable/progress_activity.css">
+  <link rel="stylesheet" href="style_unstable/scrolling.css">
+  <link rel="stylesheet" href="style_unstable/seekbars.css">
+  <link rel="stylesheet" href="style_unstable/tabs.css">
+  <link rel="stylesheet" href="style_unstable/toolbars.css">
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="icons/styles/action_icons.css">
+  <link rel="stylesheet" href="icons/styles/media_icons.css">
+  <link rel="stylesheet" href="icons/styles/comms_icons.css">
+  <link rel="stylesheet" href="icons/styles/settings_icons.css">
+
+  <!-- Transitions -->
+  <link rel="stylesheet" href="transitions.css">
+
+  <!-- Util CSS: some extra tricks -->
+  <link rel="stylesheet" href="util.css">
+  <link rel="stylesheet" href="fonts.css">
+
+  <!-- Additional markup to make Building Blocks kind of cross browser -->
+  <link rel="stylesheet" href="cross_browser.css">
+
+  <style>
+    #index {
+      height: 100%;
+    }
+    [data-position="right"] {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      transform: translateX(100%);
+      -webkit-transform: translateX(100%);
+      z-index: 15;
+      z-index: 100; /* -> drawer */
+    }
+    section[role="region"][data-position="right"] {
+      position: absolute;
+    }
+    [data-position="right"].current {
+      animation: rightToCurrent 0.4s forwards;
+      -webkit-animation: rightToCurrent 0.4s forwards;
+    }
+    [data-position="right"].right {
+      animation: currentToRight 0.4s forwards;
+      -webkit-animation: currentToRight 0.4s forwards;
+    }
+    [data-position="current"].left {
+      animation: currentToLeft 0.4s forwards;
+      -webkit-animation: currentToLeft 0.4s forwards;
+    }
+    [data-position="current"].current {
+      animation: leftToCurrent 0.4s forwards;
+      -webkit-animation: leftToCurrent 0.4s forwards;
+    }
+    [data-position="back"] {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: -1;
+      opacity: 0;
+      /* z-index: 100; -> drawer */
+    }
+    [data-position="back"].fade-in {
+      z-index: 120;
+      animation: fadeIn 0.2s forwards;
+      -webkit-animation: fadeIn 0.2s forwards;
+    }
+    [data-position="back"].fade-out {
+      animation: fadeOut 0.2s forwards;
+      -webkit-animation: fadeOut 0.2s forwards;
+    }
+
+    [data-position="edit-mode"] {
+      position: absolute;
+      top: -5rem;
+      left: 0;
+      right: 0;
+      bottom: -7rem;
+      z-index: -1;
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+    [data-position="edit-mode"].edit {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 120;
+      opacity: 1;
+    }
+
+    /* Headers */
+    #headers section[role="region"] {
+      margin-bottom: 1.5rem;
+    }
+    #headers section[role="region"]:not(#drawer) {
+      display: inline;
+    }
+    #headers article header:first-child {
+      margin-top: 1.5rem;
+    }
+    #headers section[role="region"] header h2 {
+      margin: 0 0 1.5rem 0;
+    }
+
+    /* Lists */
+    /* to avoid double background effect on press */
+    [data-type=list] li>a:active {
+      background-color: transparent;
+    }
+
+    /* Drawer */
+    section[role="region"]:not(#drawer) {
+      transition: none;
+      left: 0;
+      z-index: 0;
+      padding-left: 0;
+    }
+    section[data-type="sidebar"] + section[role="region"] > header:first-child > button,
+    section[data-type="sidebar"] + section[role="region"] > header:first-child > a {
+      background-position: 3.5rem center;
+    }
+
+    /* Switches */
+    #switches label:last-child {
+      margin-left: 2rem;
+    }
+
+    /* Scrolling */
+    nav[data-type="scrollbar"] {
+      padding-top: 1rem;
+    }
+    nav[data-type="scrollbar"] p {
+      opacity: 1;
+    }
+
+    /* Seek bars */
+    div[role="slider"] > label.icon {
+      background: no-repeat right top;
+      background-size: 3rem auto;
+    }
+
+    /* Tabs */
+    #tabs .content {
+      padding: 0;
+    }
+    #tabs .content .content {
+      padding: 1.5rem 3rem;
+    }
+
+    /* Filters */
+    [role="tablist"][data-type="filter"] {
+      margin-bottom: 2rem;
+    }
+
+    .bottom[role="tablist"][data-type="filter"] {
+      bottom: auto;
+    }
+
+    /* Device rotation */
+    .landscape section[role="region"]#drawer > header:first-child {
+      /* Whatever needs to be changed on landscape */
+    }
+  </style>
+
+
+ <script>
+
+
+function showOptionValues() {
+        html ="";
+html += 'optionGPS[0]: '+ document.getElementsByName("optionGeo")[0].checked + '\n';
+html += 'optionGPS[1]: '+ document.getElementsByName("optionGeo")[1].checked + '\n';
+html += 'optionGPS[2]: '+ document.getElementsByName("optionGeo")[2].checked + '\n';
+html += 'lat: '+ $("#lat").val() + '\n';
+
+
+html += 'optionPerimeter: '+ Math.round($("#optionPerimeter").val()*100) + '\n';
+html += 'optionTime: '+ Math.round($("#optionTime").val()*600) + '\n';
+html += 'optionTemperature: '+ Math.round($("#optionTemperature").val()*70-30) + '\n';
+html += 'optionRain: '+ Math.round($("#optionRain").val()*50) + '\n';
+html += 'optionWeather[0]: '+ document.getElementsByName("optionWeather")[0].checked + '\n';
+html += 'optionWeather[1]: '+ document.getElementsByName("optionWeather")[1].checked + '\n';
+html += 'optionWeather[2]: '+ document.getElementsByName("optionWeather")[2].checked + '\n';
+html += 'optionDirection[0]: '+ document.getElementsByName("optionDirection")[0].checked + '\n';
+html += 'optionDirection[1]: '+ document.getElementsByName("optionDirection")[1].checked + '\n';
+html += 'optionDirection[2]: '+ document.getElementsByName("optionDirection")[2].checked + '\n';
+html += 'optionDecision[0]: '+ document.getElementsByName("optionDecision")[0].checked + '\n';
+html += 'optionDecision[1]: '+ document.getElementsByName("optionDecision")[1].checked + '\n';
+
+
+        alert(html);
+
+}
+
+window.onload = function () {
+  //new countup(1, 'progressLoading');
+
+  main();
+};
+
+
+
+function reloadData() {
+        //$("#resultDiv").html("");
+        $(progressLoading).val(10);
+
+        locationArray = new Array();
+
+        numberOfWeatherRequests=0;
+        numberOfWeatherRequestsDone=0;
+        numberOfDirectionRequests=0;
+        numberOfDirectionRequestsDone=0;
+
+        maxMinutesForTraveling = 0;
+
+        main();
+}
+
+
+
+//new
+function main()
+{
+
+        if (document.getElementsByName("optionGeo")[0].checked==true) {
+
+                $(progressText).html("get position");
+                if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(getClimbingSpots);
+                }
+                else{alert("Geolocation is not supported by this browser.");}
+        }
+        if (document.getElementsByName("optionGeo")[1].checked==true) {
+
+                $(progressText).html("get position");
+                if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(getClimbingSpots);
+                }
+                else{alert("Geolocation is not supported by this browser.");}
+        }
+
+        if (document.getElementsByName("optionGeo")[2].checked==true) {
+
+                $(progressText).html("use simulated position");
+                getClimbingSpots();
+        }
+
+}
+
+var gLat = 52;
+var gLon = 8;
+
+// Make the actual CORS request.
+function getClimbingSpots(position) {
+
+  $(progressText).html("got position");
+
+  if (document.getElementsByName("optionGeo")[2].checked==true) {
+                gLat= $("#lat").val();
+          gLon= $("#lon").val();
+        } else {
+          gLat= position.coords.latitude;
+          gLon= position.coords.longitude;
+        }
+  lat = gLat * Math.PI / 180;
+  lon = gLon * Math.PI / 180;
+
+  radius = 6371000;
+  parallel_radius = radius*Math.cos( lat);
+  distance =Math.round($("#optionPerimeter").val()*100*1000);   //umkreis
+
+  minLat = (lat -  (distance / radius)) * 180 / Math.PI  ;
+  maxLat = (lat +  (distance / radius)) * 180 / Math.PI  ;
+  minLon = (lon - (distance /parallel_radius))* 180 / Math.PI  ;
+  maxLon = (lon + (distance /parallel_radius))* 180 / Math.PI  ;
+
+  var boundingBox = "(" + minLat + "," + minLon + "," + maxLat + "," + maxLon + ");" ;
+  //var overpassQL = '(way["sport"="climbing"]' + boundingBox + 'way["sport"="climbing"]' + boundingBox+ ");"+ "(._;>;);out;";
+  var myUrl = 'http://overpass-api.de/api/interpreter?data=[out:json];%28way[%22sport%22%3D%22climbing%22]'+encodeURIComponent(boundingBox)+'node[%22sport%22%3D%22climbing%22]'+encodeURIComponent(boundingBox)+'%29%3B%28._%3B%3E%3B%29%3Bout%3B';
+  //alert(myUrl);
+
+  $(progressText).html("get climing sites for " +gLat + "," + gLon + " in " + Math.round($("#optionPerimeter").val()*100) + "km");
+  $(progressLoading).val($(progressLoading).val()+10);
+
+  $.ajax({
+                        url: myUrl,
+                        cache: false,
+                        dataType: 'json',
+                        crossDomain:true,
+                        success: createResult,
+                        error: function(xhr, status, error) {
+                           alert(error+'\n'+status+'\n'+xhr.statusText);
+                        }
+                });
+}
+
+
+var locationArray = new Array();
+
+// the real thing
+function createResult(data){
+
+        //$(progressText).html("got climbing sites");
+    fillLocationArray(data,locationArray);
+
+        if (document.getElementsByName("optionWeather")[0].checked) {
+        for (var i = 0; i < locationArray.length; i++) {
+                        locationArray[i]["weatherUrl"] = "";
+                        locationArray[i]["weatherUrl2"] = "";
+                        locationArray[i]["weatherClimbing"] = false;
+                        locationArray[i]["weatherTemp"] = 0;
+                        locationArray[i]["weatherRain"] = 0 ;
+                        locationArray[i]["weatherText"] = "";
+                        locationArray[i]["weatherIcon"] = '"addon/unknown-weather.png"';
+        };
+
+        }
+        //fire weather request for outdoor locations
+        if (document.getElementsByName("optionWeather")[1].checked) {
+        for (var i = 0; i < locationArray.length; i++) {
+                if (locationArray[i]["Type"] == "outdoor") {
+                    numberOfWeatherRequests++;
+                                        //alert("i:" + i +" " +locationArray[i]["Lat"] + "," +locationArray[i]["Lon"] );
+                                        $(progressText).html("fired OpenWeatherMap weather requests " + numberOfWeatherRequests);
+                    getWeatherOpenWeatherMap(i, locationArray[i]["Lat"],locationArray[i]["Lon"] );
+                }
+        };
+
+        }
+        if (document.getElementsByName("optionWeather")[2].checked) {
+        for (var i = 0; i < locationArray.length; i++) {
+                if (locationArray[i]["Type"] == "outdoor") {
+                    numberOfWeatherRequests++;
+                                        //alert("i:" + i +" " +locationArray[i]["Lat"] + "," +locationArray[i]["Lon"] );
+                                        $(progressText).html("fired metwit weather requests " + numberOfWeatherRequests);
+                    getWeatherMetwit(i, locationArray[i]["Lat"],locationArray[i]["Lon"] );
+                }
+        };
+        }
+
+        //fire direction request
+        if (document.getElementsByName("optionDirection")[1].checked) {
+        for (var i = 0; i < locationArray.length; i++) {
+                if (locationArray[i]["Type"]  != "?") {
+                    numberOfDirectionRequests++;
+                                        $(progressText).html("fired direction requests " + numberOfDirectionRequests);
+                    getDirectionCloudmade(i, locationArray[i]["Lat"],locationArray[i]["Lon"] );
+                }
+        };
+        }
+        if (document.getElementsByName("optionDirection")[2].checked) {
+
+        for (var i = 0; i < locationArray.length; i++) {
+                if (locationArray[i]["Type"]  != "?") {
+                    numberOfDirectionRequests++;
+                                        $(progressText).html("fired direction requests " + numberOfDirectionRequests);
+                    getDirectionOSRM(i, locationArray[i]["Lat"],locationArray[i]["Lon"] );
+                }
+        };
+
+        }
+
+}
+
+
+function getWeatherOpenWeatherMap(pos, lat,lon) {
+        var temperatur =0;
+        var rain =0;
+        var weatherText="";
+        var weatherIcon = '"addon/unknown-weather.png"';
+
+
+    var weatherUrl  = 'http://api.openweathermap.org/data/2.5/weather?lat='+lat+',&lon='+lon+'&units=metric';
+    var weatherUrl2 = 'http://api.openweathermap.org/data/2.5/weather?lat='+lat+',&lon='+lon+'&mode=html';
+
+        //alert(weatherUrl);
+    $.ajax({
+      dataType: "jsonp",
+      url: weatherUrl,
+      success: function(data) {
+                temperatur = Math.round(data.main.temp);
+                                weatherText = temperatur + "&deg;C" ;
+                try {
+                    rain =  JSON.stringify(data.rain).replace(/\"3h\":/g, "").replace(/{/g, "").replace(/}/g, "") ;
+
+                } catch (error) {
+                    locationArray[pos]["weatherError"] = error;
+                }
+
+                                if ( rain > 0 ) {
+                                        weatherText += " " + rain + "mm rain";
+                                }
+                                weatherClimbing = true;
+                                if (temperatur <  Math.round($("#optionTemperature").val()*70-30) ) {
+                                        weatherClimbing = false;
+                                }
+                                if (rain >  Math.round($("#optionRain").val()*50) ) {
+                                        weatherClimbing = false;
+                                }
+                locationArray[pos]["weatherUrl"] = weatherUrl;
+                locationArray[pos]["weatherUrl2"] = weatherUrl2;
+                locationArray[pos]["weatherClimbing"] = weatherClimbing;
+                locationArray[pos]["weatherTemp"] = temperatur;
+                locationArray[pos]["weatherRain"] = rain ;
+                locationArray[pos]["weatherText"] = weatherText;
+                                locationArray[pos]["weatherIcon"] = '"http://openweathermap.org/img/w/' + data.weather[0].icon + '.png"';
+                                numberOfWeatherRequestsDone++;
+                        myFinish("getWeatherOpenWeatherMap"); //ajaxComplete seems not to work as expected
+      },
+                error: function(xhr, status, error) {
+                        numberOfWeatherRequestsDone++;
+                        alert(error+'\n'+status+'\n'+xhr.statusText);
+                }
+
+
+    });
+
+}
+
+
+
+function getWeatherMetwit(pos, lat,lon) {
+        var temperatur =0;
+        var rain =0;
+        var weatherText="";
+        var weatherIcon = '"addon/unknown-weather.png"';
+
+
+    var weatherUrl =  'https://api.metwit.com/v2/weather/?location_lat='+lat+'&location_lng='+lon+"&units=metric";
+    var weatherUrl2 = 'https://metwit.com/apps/web/?lat='+lat+',&lng='+lon;
+
+        $.getJSON( weatherUrl)
+        .done(function( data ) {
+                temperatur = Math.round(data.objects[0].weather.measured.temperature-273.15); //from Kelvin to Celsius
+
+                weatherText = temperatur + "&deg;C" ;
+                try {
+                        rain =  JSON.stringify(data.rain).replace(/\"3h\":/g, "").replace(/{/g, "").replace(/}/g, "") ;
+
+                } catch (error) {
+                        locationArray[pos]["weatherError"] = error;
+                }
+
+                if ( rain > 0 ) {
+                        weatherText += " " + rain + "mm rain";
+                }
+                weatherClimbing = true;
+                if (temperatur <  Math.round($("#optionTemperature").val()*70-30) ) {
+                        weatherClimbing = false;
+                }
+                if (rain >  Math.round($("#optionRain").val()*50) ) {
+                        weatherClimbing = false;
+                }
+
+                locationArray[pos]["weatherUrl"] = weatherUrl;
+                locationArray[pos]["weatherUrl2"] = weatherUrl2;
+                locationArray[pos]["weatherClimbing"] = weatherClimbing;
+                locationArray[pos]["weatherTemp"] = temperatur;
+                locationArray[pos]["weatherRain"] = rain ;
+                locationArray[pos]["weatherText"] = weatherText;
+                locationArray[pos]["weatherIcon"] = data.objects[0].icon;
+                numberOfWeatherRequestsDone++;
+                myFinish("getWeatherMetwit"); //ajaxComplete seems not to work as expected
+
+        });
+
+
+
+}
+
+var maxMinutesForTraveling = 0;
+
+function getDirectionCloudmade(pos, lat,lon) {
+        var distance =0;
+        var traveltime =0;
+        //var directionText="";
+
+    var directionUrl = 'http://routes.cloudmade.com/c6f2762bfe00414f822a9dec443569f5/api/0.3/'+gLat+','+gLon+','+lat+','+lon+'/car.js?callback=?';
+        locationArray[pos]["directionUrl"] = directionUrl;
+
+        $.getJSON(directionUrl, function (data) {
+                var test = data;
+                //alert(JSON.stringify(test));
+
+                traveltime = Math.round(test.route_summary.total_time/60) ;//to minutes
+                distance = Math.round(test.route_summary.total_distance/1000) ; //to kilometer
+
+                locationArray[pos]["directionMinutes"] = traveltime;
+                locationArray[pos]["directionText"] =  distance + "km " + traveltime + "minutes";
+
+                if (traveltime>maxMinutesForTraveling) {
+                                maxMinutesForTraveling = traveltime;
+                }
+
+                numberOfDirectionRequestsDone++;
+                myFinish("getDirectionCloudmade"); //ajaxComplete seems not to work as expected
+
+        });
+
+}
+
+
+function getDirectionOSRM(pos, lat,lon) {
+        var distance =0;
+        var traveltime =0;
+        //var directionText="";
+
+    var directionUrl = 'http://router.project-osrm.org/viaroute?loc='+gLat+','+gLon+'&loc='+lat+','+lon;
+        locationArray[pos]["directionUrl"] = directionUrl;
+
+        $.getJSON(directionUrl, function (data) {
+                var test = data;
+                //alert(JSON.stringify(test));
+
+                traveltime = Math.round(data.route_summary.total_time/60) ;//to minutes
+                distance = Math.round(data.route_summary.total_distance/1000) ; //to kilometer
+
+                locationArray[pos]["directionMinutes"] = traveltime;
+                locationArray[pos]["directionText"] =  distance + "km " + traveltime + "minutes";
+
+                if (traveltime>maxMinutesForTraveling) {
+                                maxMinutesForTraveling = traveltime;
+                }
+
+                numberOfDirectionRequestsDone++;
+                myFinish("getDirectionOSRM"); //ajaxComplete seems not to work as expected
+
+        });
+
+}
+
+function getDirectionGoogle(pos, lat,lon) {
+        var distance =0;
+        var traveltime =0;
+        //var directionText="";
+
+    var directionUrl = 'http://maps.googleapis.com/maps/api/directions/json?origin='+gLat+','+gLon+'&destination='+lat+','+lon+'&sensor=false';
+        //alert(pos + " "+ directionUrl);
+        locationArray[pos]["directionUrl"] = directionUrl;
+
+    $.ajax({
+      url: directionUrl,
+          cache: false,
+          dataType: 'json',
+          crossDomain:true,
+
+      success: function(data) {
+                                alert(pos);
+                try {
+                    distance = Math.round(data.routes[0].legs[0].distance.value/1000); //to kilometer
+                    traveltime = Math.round(data.routes[0].legs[0].duration.value/60); //to minutes
+                                        alert(pos + ": " + traveltime);
+
+                } catch (error) {
+                    locationArray[pos]["distanceText"] = error;
+                }
+
+                locationArray[pos]["directionMinutes"] = traveltime;
+                locationArray[pos]["directionText"] =  distance + "km " + traveltime + "minutes";
+
+
+                                if (traveltime>maxMinutesForTraveling) {
+                                                maxMinutesForTraveling = traveltime;
+                                }
+                                numberOfDirectionRequestsDone++;
+                        myFinish("getDirection"); //ajaxComplete seems not to work as expected
+
+      },
+                error: function(xhr, status, error) {
+                        //numberOfDirectionRequestsDone++;
+                        alert(error+'\n'+status+'\n'+xhr.statusText);
+                }
+    });
+
+}
+
+numberOfWeatherRequests=0;
+numberOfWeatherRequestsDone=0;
+numberOfDirectionRequests=0;
+numberOfDirectionRequestsDone=0;
+
+
+
+function myFinish(origin){
+    $(progressText).html(origin + " weather: " + numberOfWeatherRequestsDone + " of " + numberOfWeatherRequests +" travel: " + numberOfDirectionRequestsDone + " of " + numberOfDirectionRequests );
+        $(progressLoading).val($(progressLoading).val()+10);
+
+    if (numberOfWeatherRequests+numberOfDirectionRequests == numberOfWeatherRequestsDone + numberOfDirectionRequestsDone) {
+            $(progressLoading).val(90);
+                $(progressText).html("prepare result");
+
+                getClosingTime(locationArray);
+            getClimbingTime(locationArray);
+
+                sortResult(locationArray);
+                writeResult(locationArray);
+            $(progressLoading).val(100);
+    }
+
+}
+
+var optionDistance = 25 *1000;
+function fillLocationArray(data,lArray){
+    i =0;
+
+    $.each(data.elements, function(index, value) {
+         if (value.tags) {
+            if (value.tags.sport =="climbing") {
+                lArray[i] = new Object();
+                                lArray[i]["id"] = value.id;
+                lArray[i]["Name"]  = value.tags.name;
+                lArray[i]["website"] = "";
+                lArray[i]["url"] = "";
+                if (value.tags.website) {
+                        lArray[i]["Name"]  = "<a href='" + value.tags.website + "'>" + value.tags.name + "</a>";
+                }
+                if (value.tags.url) {
+                        lArray[i]["Name"]  += "<a href='" + value.tags.url + "'>" + "[...]" + "</a>";
+                }
+                if (value.lat) {
+
+                    lArray[i]["Lat"] = value.lat;
+                    lArray[i]["Lon"] = value.lon;
+                } else {
+                        try {
+                            lArray[i]["Lat"] = getNodeLat(value.nodes[0],data);
+                            lArray[i]["Lon"] = getNodeLon(value.nodes[0],data);
+                        } catch (error) {
+                            lArray[i]["Lat"] = gLat;
+                            lArray[i]["Lon"] = gLon;
+                        }
+                }
+                lArray[i]["airDistance"] = myDistance( lArray[i]["Lat"] , lArray[i]["Lon"], gLat, gLon);
+                lArray[i]["Type"] = getbuildings(value);
+                                //alert(lArray[i]["Type"]);
+                lArray[i]["openingHours"] = "";
+                if (value.tags.opening_hours) {
+                   lArray[i]["openingHours"] = value.tags.opening_hours;
+                }
+                lArray[i]["minutesForClimbing"] = 0;
+
+                tags ="";
+                webcam ="";
+                $.each(value.tags, function(i, v) {
+                        if (i.search(/.+webcam/) != -1){
+                                webcam = v;
+                        }
+                        if (i.search(/climbing.+/) != -1){
+                                                                //todo: use join function of array
+                                tags += komma(tags) + i.slice(9) + ":" + v ;
+                        }
+                });
+                lArray[i]["tags"] = tags;
+                lArray[i]["webcam"] = webcam;
+
+                i++;
+            }
+        }
+    });
+
+}
+
+function getNodeLat(id, data){
+        rValue = 0;
+        $.each(data.elements, function(index, value) {
+                        if (value.id == id ) {
+                                        rValue = value.lat; //alert("found "+ id + " " + value.lat + " , " + value.lon);
+                        }
+        });
+        return rValue;
+}
+
+function getNodeLon(id, data){
+        rValue = 0;
+    $.each(data.elements, function(index, value) {
+        if (value.id == id ) {
+                        rValue = value.lon;
+                }
+    });
+    return rValue;
+}
+
+function myDistance(lat1, lon1, lat2, lon2) {
+        radlat1 = Math.PI * lat1/180;
+        radlat2 = Math.PI * lat2/180;
+        radlon1 = Math.PI * lon1/180;
+        radlon2 = Math.PI * lon2/180;
+        theta = lon1-lon2;
+        radtheta = Math.PI * theta/180;
+        dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+        dist = Math.acos(dist);
+        dist = dist * 180/Math.PI;
+        dist = dist * 60 * 1.1515;
+        dist = dist * 1.609344;
+        return dist.toFixed(1);
+}
+
+function getbuildings(v) {
+        result ="?"; //default
+        if ( v.tags.building == "yes" ) {result ="buildings"};
+        if ( v.tags.type == "buildings" ) {result ="buildings"};
+        if ( v.tags.type == "cliff" ) {result ="outdoor"};
+        if ( v.tags.natural == "cliff" ) {result ="outdoor"};
+        if ( v.tags.natural == "bare_rock" ) {result ="outdoor"};
+
+        try {
+           oo=v.tags.opening_hours;
+           if ( v.tags.opening_hours.search(/.*sunset.*/) != -1 ) {result ="outdoor"};
+        } catch( err ) {
+
+        }
+
+        return result;
+
+}
+
+
+function getClosingTime(lArray){
+
+    sunset = getSunset();
+    var currentdate = new Date();
+
+        for (var i = 0; i < lArray.length; i++) {
+                lArray[i]["minutesUntilClosing"] =0; //default
+
+                if (lArray[i]["Type"] == "?") {
+                                lArray[i]["minutesUntilClosing"] =0;
+                }
+                if (lArray[i]["Type"] == "buildings") {
+                  if ( lArray[i]["openingHours"] != "") {
+                                // use opening hours from https://github.com/ypid/opening_hours.js
+                                //alert(lArray[i]["openingHours"]); //Mo-Sa 11:00-23:00; Su,PH 11:00-21:00
+                        try {
+                                var oh = new opening_hours(lArray[i]["openingHours"]);
+                                var nextChange = oh.getNextChange();
+
+                                lArray[i]["minutesUntilClosing"] = (nextChange.getHours()-currentdate.getHours())*60 + (nextChange.getMinutes() - currentdate.getMinutes() ) *1 ;
+                                if (!oh.getState()) {
+                                        lArray[i]["minutesUntilClosing"] = 0; //is closed
+                                }
+                        } catch (error) {
+                                //asume closing time when opening-hours api fails
+                                //todo dont fail on holidays
+                                lArray[i]["minutesUntilClosing"] = (23-currentdate.getHours())*60 + (0 - currentdate.getMinutes() ) *1 ;
+                        }
+                  } else {
+                                //asume closing time when not given
+                                lArray[i]["minutesUntilClosing"] = (23-currentdate.getHours())*60 + (0 - currentdate.getMinutes() ) *1 ;
+                  }
+
+                }
+                if (lArray[i]["Type"] == "outdoor") {
+                                lArray[i]["closingTime"] =sunset;
+                                var timeparts = sunset.split(":");
+                                lArray[i]["minutesUntilClosing"]  = (timeparts[0]-currentdate.getHours())*60 + (timeparts[1] - currentdate.getMinutes() ) *1 ;
+                }
+
+        };
+
+}
+
+function getClimbingTime(lArray){
+
+var isAndroid = navigator.userAgent.match(/android/i) ? true : false;
+var isIOS = navigator.userAgent.match(/(ipod|ipad|iphone)/i) ? true : false;
+
+        for (var i = 0; i < lArray.length; i++) {
+                minutesForTravel =0; //default
+                travelHtml = "";
+                if (document.getElementsByName("optionDirection")[0].checked || lArray[i]["Type"] == "?" ) {
+                        minutesForTravel=Math.round(lArray[i]["airDistance"]*2);
+                        travelHtml = Math.round(lArray[i]["airDistance"]) +" km air distance";
+                }
+                if (document.getElementsByName("optionDirection")[1].checked && lArray[i]["directionMinutes"]) {
+                        minutesForTravel = lArray[i]["directionMinutes"];
+                        travelHtml = lArray[i]["directionMinutes"] +" min drive";
+                }
+                if (document.getElementsByName("optionDirection")[2].checked && lArray[i]["directionMinutes"]) {
+                        minutesForTravel = lArray[i]["directionMinutes"];
+                        travelHtml = lArray[i]["directionMinutes"] +" min drive";
+                }
+
+                lArray[i]["minutesForClimbing"] = lArray[i]["minutesUntilClosing"] - minutesForTravel;
+                if ( isAndroid ) {
+                        lArray[i]["travelHtml"] = "<a href='google.navigation:q=" + lArray[i]["Lat"] +"," + lArray[i]["Lon"] + "'>"  + travelHtml + "</a>";
+                } else {
+                        lArray[i]["travelHtml"] = "<a href='" + "https://www.google.com/maps?saddr=" + gLat+ "," + gLon + "&daddr=" + lArray[i]["Lat"] + "," + lArray[i]["Lon"] + "'>" + travelHtml + "</a>";
+                }
+        };
+
+}
+
+function getSunset() {
+ d = new Date();
+  return (toHms(getSunsetTime(d,gLat, gLon)));
+}
+
+function getSunsetTime(d, lat, lon) {
+    var sunsetObj = new SunriseSunset(
+      d.getFullYear(),
+      d.getMonth() + 1,
+      d.getDate(),
+      lat, lon);
+    var tzCorrection = -1 * d.getTimezoneOffset() / 60;
+    return sunsetObj.sunsetLocalHours(tzCorrection);
+}
+
+function toHms  (tIn) {
+      var hours = Math.floor(tIn);
+      var minutes = Math.floor((tIn - hours) * 60);
+      return hours + ":" + pad(minutes) ;
+}
+
+function toHm  (tIn) {
+      var hours = Math.floor(tIn/60);
+      var minutes = Math.floor( tIn- (hours * 60) );
+      return hours + ":" + pad(minutes) ;
+}
+
+
+function pad  (n) {
+    return (n < 10) ? ("0" + n) : n;
+}
+
+function komma(s) {
+    return (s != "") ? (", ") : "";
+}
+
+
+function sortResult(lArray){
+
+        function climbSort (a, b) {
+                var delta = 0;
+                //delta = a["airDistance"]-b["airDistance"];
+
+                switch (a["Type"]) {
+                  case "buildings":
+                    if (b["Type"] == "buildings") {delta = 0};
+                    if (b["Type"] == "outdoor") {delta = 1};
+                    if (b["Type"] == "?") {delta = -1};
+                    break;
+                  case "outdoor":
+                    if (b["Type"] == "buildings") {delta = -1};
+                    if (b["Type"] == "outdoor") {delta = 0};
+                    if (b["Type"] == "?") {delta = -2};
+                    break;
+                  case "?":
+                    if (b["Type"] == "buildings") {delta = 1};
+                    if (b["Type"] == "outdoor") {delta = 2};
+                    if (b["Type"] == "?") {delta = 0};
+                    break;
+                  default:
+                     delta =  a["airDistance"]-b["airDistance"];
+                    break;
+                }
+
+                dist = (a["airDistance"]-b["airDistance"])/ ($("#optionPerimeter").val()*100*2);
+                delta += dist;
+                return delta;
+        }
+        lArray.sort(climbSort);
+}
+
+function writeResult(lArray){
+        html = "";
+
+        resultText = "no outdoor climbing rocks found";
+        goodResults = 0;
+html += '<section data-type="list">';
+
+        var previousType="";
+
+    for (var i = 0; i < lArray.length; i++) {
+                if (previousType != lArray[i]["Type"] ) {
+                        html += '<header>' + lArray[i]["Type"] + '</header>';
+                        html += '        <ul>';
+                }
+
+                htmlP1 = "";                htmlP2 = "";                htmlDisabled = "";        htmlTags ="";        icon = '<img alt="buildings" src="addon/unknown-weather.png">';
+                if ( lArray[i]["minutesForClimbing"] <= Math.round($("#optionTime").val()*600) ) {
+                        htmlDisabled ='aria-disabled="true"';
+                }
+
+                if (lArray[i]["Type"] =="outdoor" ) {
+                        icon = '<a href="' + lArray[i]["weatherUrl2"] +  '"><img src=' + lArray[i]["weatherIcon"] + '></a>';
+                        //icon = '<iframe  seamless src="' + lArray[i]["weatherUrl2"] + '"></iframe>';
+                        htmlP2 += lArray[i]["weatherText"];
+                        if ( !lArray[i]["weatherClimbing"] ) {
+                                htmlDisabled ='aria-disabled="true"';
+                                resultText = "bad weather for outdoor climbing";
+                        } else {
+                                goodResults++;
+                        }
+                        if ( lArray[i]["tags"] == "") {
+                                htmlTags = "<a href='http://www.openstreetmap.org/edit?editor=id#map=18/" + lArray[i]["Lat"] + "/" + lArray[i]["Lon"] + "'>please add climbing tags (" + lArray[i]["id"] + ")</a>";
+                        } else {
+                                htmlTags = "<a href='http://www.openstreetmap.org/edit?editor=id#map=18/" + lArray[i]["Lat"] + "/" + lArray[i]["Lon"] + "'>" + lArray[i]["tags"] + "</a>";
+                        }
+                }
+                if (goodResults > 0) {
+                        resultText = "found " + goodResults + " outdoor climbing rocks";
+                }
+                if (lArray[i]["Type"] =="buildings" ) {
+                        icon = '<img alt="buildings" src="addon/buildings.png">';
+                        if ( lArray[i]["openingHours"] == "") {
+                                htmlTags = "<a href='http://www.openstreetmap.org/edit?editor=id#map=18/" + lArray[i]["Lat"] + "/" + lArray[i]["Lon"] + "'>please add opening hours (" + lArray[i]["id"] + ")</a>";
+                        } else {
+                                htmlTags = "<a href='http://www.openstreetmap.org/edit?editor=id#map=18/" + lArray[i]["Lat"] + "/" + lArray[i]["Lon"] + "'>" + lArray[i]["openingHours"] + "</a>";
+                        }
+                }
+                if ( lArray[i]["webcam"] != "") {
+                  icon = "<a href='" + lArray[i]["webcam"] + "'>" + "<img src=" +  lArray[i]["webcam"] + ">" + "</a>";
+                }
+                if (lArray[i]["Type"] == "?" ) {
+                        //htmlDisabled = "";
+                      htmlTags = "<a href='http://www.openstreetmap.org/edit?editor=id#map=18/" + lArray[i]["Lat"] + "/" + lArray[i]["Lon"] + "'>please check (" + lArray[i]["id"] + ")</a>";
+                }
+                if (document.getElementsByName("optionDecision")[1].checked) {
+                        htmlDisabled="";
+                }
+
+                html+='<li ' + htmlDisabled + '>';
+                html += '            <aside class="pack-start">';
+                html += '              ' + icon ;
+                html += '            </aside>';
+
+
+                htmlP1 = lArray[i]["Name"];
+
+                if (lArray[i]["Type"] != "?" ) {
+                        htmlP1 += "(" + toHm(lArray[i]["minutesForClimbing"]) + ")" ;
+
+                }
+                htmlP2 += komma(htmlP2) +  lArray[i]["travelHtml"];
+                htmlP2 += komma(htmlTags) + htmlTags;
+
+                html += '<p>' + htmlP1 + '</p>';
+                html += "<p>" + htmlP2 + "</p>";
+                //+ lArray[i]["weatherText"]
+                //html += "<p>" + "drive time: " + lArray[i]["directionMinutes"] + " " + " air distance*2:" + lArray[i]["airDistance"]*2 + " " + "</p>";
+
+  //alert (html);
+                html+="</li>";
+
+                if (previousType != lArray[i]["Type"] ) {
+                        html += '        </ul>';
+                        previousType = lArray[i]["Type"];
+                }
+
+        }
+
+html += '        </ul>';
+html += '      </section>        ';
+
+
+        $(resultDiv).html(html);
+    $(progressText).html(resultText);
+
+}
+
+
+  </script>
+</head>
+
+<body role="application">
+
+  <section data-type="sidebar">
+    <header>
+
+       <menu type="toolbar">
+                <a href="#">Done</a>
+      </menu>
+             <h1><span style="float:left;" class="action-icon ut-settings">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>Settings</h1>
+
+    </header>
+
+
+    <nav>
+      <ul>
+        <li>
+           <h2>geo location:</h2>
+                       <label class="default">
+                        <input name="optionGeo"  type="radio">
+                        <span>from IP</span>
+                      </label>
+
+                      <label class="recommend">
+                        <input name="optionGeo" checked="" type="radio">
+                        <span>GPS</span>
+                      </label>
+
+                      <label class="recommend">
+                        <input name="optionGeo" type="radio">
+                        <span> simulate</span>
+                      </label>
+                                <fieldset>
+                                  <legend>lat/lon</legend>
+                                  <section>
+                                        <p>
+                                                <!-- add value=50 -->
+                                          <input id="lat" type="lat" placeholder="50.2" >
+                                          <input id="lon" type="lon" placeholder="8.6" >
+                                        </p>
+                                  </section>
+                                </fieldset>
+
+        </li>
+<!--
+     <li>
+           <h2>time:</h2>
+                       <label class="default">
+                        <input name="optionTime"  type="radio">
+                        <span>current</span>
+                      </label>
+
+
+                      <label class="recommend">
+                        <input name="optionTime" type="radio">
+                        <span> simulate</span>
+                      </label>
+                                <fieldset>
+                                  <legend>dd/mm/yyyy</legend>
+                                  <section>
+                                        <p>
+                                          <input type="dd" placeholder="08" >
+                                          <input type="mm" placeholder="11" >
+                                          <input type="yyyy" placeholder="2013" >
+                                        </p>
+                                  </section>
+                                </fieldset>
+                                <fieldset>
+                                  <legend>hh/mm</legend>
+                                  <section>
+                                        <p>
+                                          <input type="hh" placeholder="50" >
+                                          <input type="mm" placeholder="3" >
+                                        </p>
+                                  </section>
+                                </fieldset>
+
+        </li>
+-->
+
+        <li>
+<header><h2>search for climbing sites in this perimeter (km)</h2></header>
+        <div role="slider" aria-valuemin="0" aria-valuenow="25" aria-valuemax="100" aria-valuetext="slider description">
+          <label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0</label>
+          <label>100&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+          <div>
+            <progress  id="optionPerimeter" value="1" max="1"></progress>
+            <button style="left: 446.235px; transform: translateX(351.767px);">handler</button>
+          </div>
+        </div>
+        </li>
+
+        <li>
+<header><h2>climbing time  (minutes)</h2></header>
+        <div role="slider" aria-valuemin="0" aria-valuenow="300" aria-valuemax="600" aria-valuetext="slider description">
+          <label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0</label>
+          <label>600&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+          <div>
+            <progress  id="optionTime" value="30" max="1"></progress>
+            <button style="left: 446.235px; transform: translateX(351.767px);">handler</button>
+          </div>
+        </div>
+        </li>
+
+        <li>
+<header><h2>min outdoor temperature  (&deg;C)</h2></header>
+        <div role="slider" aria-valuemin="-30" aria-valuenow="10" aria-valuemax="40" aria-valuetext="slider description">
+          <label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-30</label>
+          <label>40&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+          <div>
+            <progress id="optionTemperature"  value="10" max="1"></progress>
+            <button >handler</button>
+          </div>
+        </div>
+        </li>
+
+        <li>
+<header><h2>max outdoor rain(mm)</h2></header>
+        <div role="slider" aria-valuemin="0" aria-valuenow="3" aria-valuemax="50" aria-valuetext="slider description">
+          <label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0</label>
+          <label>50&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+          <div>
+            <progress id="optionRain"  value="3" max="1"></progress>
+            <button >handler</button>
+          </div>
+        </div>
+        </li>
+
+        <li>
+          <h2>get weather:</h2>
+
+                      <label class="default">
+                        <input name="optionWeather"  type="radio">
+                        <span>no</span>
+                      </label>
+
+                      <label class="recommend">
+                        <input name="optionWeather" checked="" type="radio">
+                        <span>OpenWeatherMap</span>
+                      </label>
+
+                      <label class="recommend">
+                        <input name="optionWeather" type="radio">
+                        <span>metwit</span>
+                      </label>
+
+
+        </li>
+  <li>
+          <h2>get driving direction:</h2>
+
+              <label class="default">
+                <input name="optionDirection"  type="radio">
+                <span> no</span>
+              </label>
+
+              <label class="default">
+                <input name="optionDirection" checked="" type="radio">
+                <span>Cloudmade</span>
+              </label>
+
+              <label class="default">
+                <input name="optionDirection"  type="radio">
+                <span>OSRM </span>
+              </label>
+    </li>
+
+<li>
+          <h2>disable bad decisions:</h2>
+
+              <label class="default">
+                <input name="optionDecision"  type="radio">
+                <span> yes</span>
+              </label>
+
+              <label class="default">
+                <input name="optionDecision" checked="" type="radio">
+                <span>no </span>
+              </label>
+
+    </li>
+   </ul>
+<!--
+<div>
+        <button onclick="javascript:showOptionValues();">Show values</button>
+</div>
+-->
+      <h2>About</h2>
+      <a href="http://wiki.openstreetmap.org/wiki/DE:Tag:sport%3Dclimbing">How to tag</a></br>
+      <ul>
+        <li>
+                        <img width="200" src="http://www.overpass-api.de/logo.png"/>
+                        <img src="https://s3-eu-west-1.amazonaws.com/caldo2-static-eu/images/new/metwit-logo.png"/>
+                        <img src="http://cloudmade.com/sites/all/themes/cmnewweb/images/logo.png"/>
+                        <img width="200" src="http://project-osrm.org/osrm3-nq8.png"/>
+                </li>
+
+
+
+      </ul>
+    </nav>
+  </section>
+
+  <section id="drawer" role="region">
+
+    <header>
+      <a href="#"><span class="icon icon-menu">hide sidebar</span></a>
+      <a href="#drawer"><span class="icon icon-menu">show sidebar</span></a>
+      <h1>KletterWetter <a href="javascript:reloadData()"><span style="float:right" class="action-icon email-sync">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a>  </h1>
+     </header>
+
+    <div role="main">
+      <progress id="progressLoading" class="pack-activity light" value="10" max="100"></progress>
+      <header ><h2 id="progressText"> progress initializing</h2></header>
+      <div>
+        <!-- <button onclick="javascript:$(helperDiv).html('asdf');">simulate </button> -->
+        <!-- <button onclick="javascript:$(progressLoading).val(20);">simulate progress</button> -->
+        <!-- use a timer instead  -->
+        <!-- <button onclick="javascript:simulateProgress();">simulate progress</button>  -->
+      </div>
+      <div id="resultDiv" >
+      </div>
+    </div>
+  </section>
+
+
+  <script type="text/javascript" defer src="js/status.js"></script>
+  <script type="text/javascript" defer src="js/seekbars.js"></script>
+  <script type="text/javascript" defer src="js/app.js"></script>
+
+        <!-- other libraries -->
+        <script type="text/javascript" src="js/SunriseSunset.js"></script>
+        <!-- opening hours from https://github.com/ypid/opening_hours.js -->
+        <script type="text/javascript" src="js/opening_hours.js"></script>
+
+  <script>
+    /*var mobile = (navigator.userAgent.search("Mobile") != -1);
+    if ( mobile ) {
+      //Let's reduce font-size when in landscape
+      //fs: current font-size
+      var fs = parseInt(window.getComputedStyle(document.documentElement).getPropertyValue( 'font-size' ), 10);
+      var mql = window.matchMedia("(orientation: portrait)");
+
+      if(mql.matches) { //portrait
+        document.documentElement.style.fontSize = fs + 'px';
+        document.body.classList.remove('landscape');
+      } else { // landscape
+        document.documentElement.style.fontSize = fs * 0.7 + 'px';
+        document.body.classList.add('landscape');
+      }
+
+      mql.addListener(function(m) {
+        if(m.matches) { //portrait
+          document.documentElement.style.fontSize = fs + 'px';
+          document.body.classList.remove('landscape');
+        }
+        else { //landscape
+          document.documentElement.style.fontSize = fs * 0.7 + 'px';
+          document.body.classList.add('landscape');
+        }
+      });
+    }*/
+
+
+// the  thing
+$( document ).ajaxComplete(function( event,request, settings ) {
+
+        //alert(settings.url);
+    //$(progressText).html("x recieved weather result " + numberOfWeatherRequestsDone + " of " + numberOfWeatherRequests );
+
+        myFinish("ajaxComplete");
+
+  }
+ );
+
+  </script>
+
+
+</body>
+</html>
+
