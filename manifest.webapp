@@ -1,14 +1,21 @@
 {
   "name": "KletterWetter",
   "description": "find nearby sport climbing sites",
-  "launch_path": "/app.html",
+  "launch_path": "http://martinkoeller.github.io/KletterWetter/app.html",
   "icons": {
-    "128": "/images/app_icon_128.png",
-    "60": "/images/app_icon_60.png"
+    "128": "http://martinkoeller.github.io/KletterWetter/images/app_icon_128.png",
+    "60": "http://martinkoeller.github.io/KletterWetter/images/app_icon_60.png"
   },
   "version": "1.1",
   "developer": {
     "name": "Martin Koeller",
   },
-  "default_locale": "en"
+  "default_locale": "en",
+  "permissions":
+	{
+		"geolocation":
+		{
+			"description": "Geolocation necessary to show your position"
+		}
+	}
 }
