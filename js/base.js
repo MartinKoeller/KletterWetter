@@ -22,7 +22,7 @@ if (navigator.mozApps) {
                     install.style.display = "none";
                 };
                 installApp.onerror = function() {
-					alert();
+					//alert();
                     alert("Install of "+manifestURL+" failed\n\n:" + installApp.error.name);
                 };
             };
