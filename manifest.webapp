@@ -10,6 +10,14 @@
   "developer": {
     "name": "Martin Koeller"
   },
-  "default_locale": "en"
+  "default_locale": "en",
+  "permissions": {
+        "geolocation": {
+            "description" : "Used to locate me"
+        },
+		"systemXHR": { 
+		    "description": "Required to make Network calls" 
+	    }
+    }
  
 }
