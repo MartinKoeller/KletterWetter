@@ -1009,6 +1009,10 @@ html += '      </section>        ';
 
     <nav>
       <ul>
+	   <li>
+	  	<button id="install"><span class="icon icon-add">install</span></button>
+	   </li>
+			
         <li>
            <h2>geo location:</h2>
                        <label class="default">
@@ -1201,7 +1205,12 @@ html += '      </section>        ';
     <header>
       <a href="#"><span class="icon icon-menu">hide sidebar</span></a>
       <a href="#drawer"><span class="icon icon-menu">show sidebar</span></a>
-      <h1>KletterWetter <a href="javascript:reloadData()"><span style="float:right" class="action-icon email-sync">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a>  </h1>
+	  <div id="online-status" title="Online"></div>
+      <h1>KletterWetter 
+	
+		
+		<a href="javascript:reloadData()"><span style="float:right" class="action-icon email-sync">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a>    
+	  </h1>
      </header>
 
     <div role="main">
@@ -1222,6 +1231,10 @@ html += '      </section>        ';
   <script type="text/javascript" defer src="js/status.js"></script>
   <script type="text/javascript" defer src="js/seekbars.js"></script>
   <script type="text/javascript" defer src="js/app.js"></script>
+  
+  <script type="text/javascript" src="js/base.js"></script>
+  <script type="text/javascript" src="js/offline.js"></script>
+
 
         <!-- other libraries -->
         <script type="text/javascript" src="js/SunriseSunset.js"></script>

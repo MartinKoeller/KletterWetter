@@ -10,12 +10,6 @@
   "developer": {
     "name": "Martin Koeller",
   },
-  "default_locale": "en",
-  "permissions":
-	{
-		"geolocation":
-		{
-			"description": "Geolocation necessary to show your position"
-		}
-	}
+  "default_locale": "en"
+ 
 }
