@@ -6,9 +6,9 @@
   <script>
     // Trun it to false to always install 'normal' package
     var supportHIDPI = false;
-//    var isFFOS = ("mozApps" in navigator && navigator.userAgent.search("Mobile") != -1);
+    var isFFOS = ("mozApps" in navigator && navigator.userAgent.search("Mobile") != -1);
 
-//    if ( isFFOS ) {
+    if ( isFFOS ) {
       var manifestUrl = 'http://MartinKoeller.github.io/KletterWetter/package.manifest';
       var req = navigator.mozApps.installPackage(manifestUrl);
       req.onsuccess = function() {
@@ -19,9 +19,9 @@
 		alert(this.error.name);
       };
 
-//    } else {
-      //window.location.href = "app.html"
-//    }
+    } else {
+      window.location.href = "app.html"
+    }
 
   </script>
 </head>
