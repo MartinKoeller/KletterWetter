@@ -308,8 +308,14 @@ function getClimbingSpots(position) {
 
   var boundingBox = "(" + minLat + "," + minLon + "," + maxLat + "," + maxLon + ");" ;
   //var overpassQL = '(way["sport"="climbing"]' + boundingBox + 'way["sport"="climbing"]' + boundingBox+ ");"+ "(._;>;);out;";
-  var myUrl = 'http://overpass-api.de/api/interpreter?data=[out:json];%28way[%22sport%22%3D%22climbing%22]'+encodeURIComponent(boundingBox)+'node[%22sport%22%3D%22climbing%22]'+encodeURIComponent(boundingBox)+'%29%3B%28._%3B%3E%3B%29%3Bout%3B';
-  //alert(myUrl);
+  
+  //sport=climbing
+  //var myUrl = 'http://overpass-api.de/api/interpreter?data=[out:json];%28way[%22sport%22%3D%22climbing%22]'+encodeURIComponent(boundingBox)+'node[%22sport%22%3D%22climbing%22]'+encodeURIComponent(boundingBox)+'%29%3B%28._%3B%3E%3B%29%3Bout%3B';
+  
+  //climbing:sport=*
+  var query = '( way ["climbing:sport"] ' + boundingBox + ' node ["climbing:sport"] ' + boundingBox + ' );(._;>;);out;' ;
+  var myUrl =  ( 'http://overpass-api.de/api/interpreter?data=[out:json];' + query);
+  console.log("overpass url: " + (myUrl) );
 
   $(progressText).html("get climing sites for " +gLat + "," + gLon + " in " + Math.round($("#optionPerimeter").val()*100) + "km");
   $(progressLoading).val($(progressLoading).val()+10);
